@@ -65,11 +65,11 @@ typedef uint8_t BOOL;
 // ============================================================
 // Only define if not already provided by board package
 #ifndef BDPIN_LED_USER_1
-#define BDPIN_LED_USER_1  55  // D55 (Red LED for Dynamixel RX indicator)
+#define BDPIN_LED_USER_1  53  // D53 (User LED 1 / Dynamixel RX indicator)
 #endif
 
 #ifndef BDPIN_LED_USER_2
-#define BDPIN_LED_USER_2  56  // D56 (Green LED for Dynamixel TX indicator)
+#define BDPIN_LED_USER_2  54  // D54 (User LED 2 / Dynamixel TX indicator)
 #endif
 
 #ifndef BDPIN_DXL_PWR_EN
@@ -91,19 +91,19 @@ typedef uint8_t BOOL;
 #endif
 
 #ifndef BDPIN_BUTTON_S1
-#define BDPIN_BUTTON_S1   57  // D57 (Button S1)
+#define BDPIN_BUTTON_S1   56  // D56 (Button S1)
 #endif
 
 #ifndef BDPIN_BUTTON_S2
-#define BDPIN_BUTTON_S2   58  // D58 (Button S2)
+#define BDPIN_BUTTON_S2   57  // D57 (Button S2)
 #endif
 
 #ifndef BDPIN_BUTTON_S3
-#define BDPIN_BUTTON_S3   59  // D59 (Button S3)
+#define BDPIN_BUTTON_S3   58  // D58 (Button S3)
 #endif
 
 #ifndef BDPIN_BUTTON_S4
-#define BDPIN_BUTTON_S4   60  // D60 (Button S4)
+#define BDPIN_BUTTON_S4   59  // D59 (Button S4)
 #endif
 
 #ifndef BDPIN_LED_R
