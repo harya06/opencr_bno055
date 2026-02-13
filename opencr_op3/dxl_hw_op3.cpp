@@ -140,11 +140,6 @@ static void dxl_hw_op3_reset_yaw_zero(bool from_button)
   imu_offset[2] = imu_euler[2];
   imu_yaw_zero_initialized = true;
 
-  if(from_button)
-  {
-    dxl_hw_op3_buzzer_tone(2000, 80);
-  }
-
   #if DEBUG
     if(from_button)
     {
@@ -168,6 +163,8 @@ void    dxl_hw_op3_button_update();
 void    dxl_hw_op3_voltage_update();
 void    dxl_hw_op3_bno_update(void);
 void    dxl_hw_op3_led_update(void);
+void    dxl_hw_op3_io_monitor_update(void);
+void    dxl_hw_op3_io_monitor_force_led_on(void);
 
 void handler_led(void)
 {
@@ -201,9 +198,12 @@ void dxl_hw_op3_init(void)
   uint16_t i;
 
   // ===== INITIALIZE SERIAL MONITOR =====
-  #if DEBUG
+  #if (DEBUG || OP3_IO_MONITOR_ENABLE)
     Serial.begin(115200);
     delay(500);
+  #endif
+
+  #if DEBUG
     Serial.println("\n=== OP3 Robot Initialization ===");
     Serial.println("[INIT] Starting hardware initialization...");
   #endif
@@ -306,16 +306,98 @@ void dxl_hw_op3_init(void)
 ---------------------------------------------------------------------------*/
 void dxl_hw_op3_update(void)
 {
-  uint8_t i;
-
   // ===== UPDATE BNO055 DATA =====
   dxl_hw_op3_bno_update();
-  
+
   // ===== UPDATE LED STATUS =====
+#if OP3_IO_MONITOR_ENABLE
+  dxl_hw_op3_io_monitor_force_led_on();
+#else
   dxl_hw_op3_led_update();
+#endif
 
   dxl_hw_op3_button_update();
   dxl_hw_op3_voltage_update();
+  dxl_hw_op3_io_monitor_update();
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : dxl_hw_op3_io_monitor_update
+     WORK    : Periodic Button/LED diagnostics for Serial Monitor
+---------------------------------------------------------------------------*/
+void dxl_hw_op3_io_monitor_update(void)
+{
+#if OP3_IO_MONITOR_ENABLE
+  static uint32_t last_print_time = 0;
+
+  if(millis() - last_print_time < 1000)
+    return;
+
+  last_print_time = millis();
+
+  const uint8_t s1 = dxl_hw_op3_button_read(PIN_BUTTON_S1);
+  const uint8_t s2 = dxl_hw_op3_button_read(PIN_BUTTON_S2);
+  const uint8_t s3 = dxl_hw_op3_button_read(PIN_BUTTON_S3);
+  const uint8_t s4 = dxl_hw_op3_button_read(PIN_BUTTON_S4);
+
+  // For output pins, digitalRead() returns current output latch level.
+  const uint8_t led1 = digitalRead(PIN_LED_1);
+  const uint8_t led2 = digitalRead(PIN_LED_2);
+  const uint8_t led3 = digitalRead(PIN_LED_3);
+  const uint8_t led_err = digitalRead(PIN_LED_ERROR);
+  const uint8_t led_run = digitalRead(PIN_LED_RUN);
+
+  Serial.print("[IO] BTN{S1=");
+  Serial.print(s1);
+  Serial.print(" S2=");
+  Serial.print(s2);
+  Serial.print(" S3=");
+  Serial.print(s3);
+  Serial.print(" S4=");
+  Serial.print(s4);
+  Serial.print("} LED{L1=");
+  Serial.print(led1);
+  Serial.print(" L2=");
+  Serial.print(led2);
+  Serial.print(" L3=");
+  Serial.print(led3);
+  Serial.print(" ERR=");
+  Serial.print(led_err);
+  Serial.print(" RUN=");
+  Serial.print(led_run);
+  Serial.print("} RGB_PWM{R=");
+  Serial.print(led_pwm_value[0]);
+  Serial.print(" G=");
+  Serial.print(led_pwm_value[1]);
+  Serial.print(" B=");
+  Serial.print(led_pwm_value[2]);
+  Serial.println("}");
+#endif
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : dxl_hw_op3_io_monitor_force_led_on
+     WORK    : Force all LEDs ON in I/O monitor mode
+---------------------------------------------------------------------------*/
+void dxl_hw_op3_io_monitor_force_led_on(void)
+{
+#if OP3_IO_MONITOR_ENABLE
+  // RGB PWM LEDs are active-low in handler_led(): 0 = ON
+  dxl_hw_op3_led_pwm(PIN_LED_R, LED_PWM_PWM_MAX);
+  dxl_hw_op3_led_pwm(PIN_LED_G, LED_PWM_PWM_MAX);
+  dxl_hw_op3_led_pwm(PIN_LED_B, LED_PWM_PWM_MAX);
+
+  // Status LEDs are used as active-high in this firmware
+  digitalWrite(PIN_LED_ERROR, HIGH);
+  digitalWrite(PIN_LED_RUN, HIGH);
+
+  // User LEDs are driven directly; 0 keeps behavior aligned with OpenCR board wiring used here
+  dxl_hw_op3_led_set(PIN_LED_1, 0);
+  dxl_hw_op3_led_set(PIN_LED_2, 0);
+  dxl_hw_op3_led_set(PIN_LED_3, 0);
+#endif
 }
 
 
@@ -374,6 +456,13 @@ void dxl_hw_op3_button_update()
           if(button_value[i] != pin_in)
           {
             button_value[i] = pin_in;
+
+            #if OP3_IO_MONITOR_ENABLE
+              Serial.print("[IO] BTN ");
+              Serial.print(button_names[i]);
+              Serial.print(" ");
+              Serial.println(button_value[i] ? "ON" : "OFF");
+            #endif
             
             if(button_pin_num[i] == PIN_BNO_RESET_CALIB && button_value[i] == 1)
             {

@@ -27,7 +27,12 @@
 // PIN CONFIGURATION SUMMARY
 // ========================
 
-#define DEBUG 1
+#define DEBUG 0
+
+#ifndef OP3_IO_MONITOR_ENABLE
+#define OP3_IO_MONITOR_ENABLE 0
+#endif
+
 #define PIN_LED_R         50    // D50 - Red channel PWM
 #define PIN_LED_G         51    // D51 - Green channel PWM
 #define PIN_LED_B         52    // D52 - Blue channel PWM

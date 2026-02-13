@@ -86,6 +86,13 @@ typedef uint8_t BOOL;
 #define OP3_BUZZER_ENABLE 0
 #endif
 
+// I/O serial monitor switch:
+// 1 = print LED/Button diagnostics to Serial Monitor
+// 0 = disable I/O diagnostics logs
+#ifndef OP3_IO_MONITOR_ENABLE
+#define OP3_IO_MONITOR_ENABLE 0
+#endif
+
 #ifndef BDPIN_BAT_PWR_ADC
 #define BDPIN_BAT_PWR_ADC A5  // Analog pin for battery voltage monitoring
 #endif
