@@ -93,6 +93,20 @@ typedef uint8_t BOOL;
 #define OP3_IO_MONITOR_ENABLE 0
 #endif
 
+// BNO calibration autosave switch:
+// 1 = allow runtime autosave to EEPROM when fully calibrated
+// 0 = disable autosave (recommended for stable DXL realtime comms)
+#ifndef OP3_BNO_AUTOSAVE_ENABLE
+#define OP3_BNO_AUTOSAVE_ENABLE 0
+#endif
+
+// BNO055 runtime switch:
+// 1 = BNO enabled
+// 0 = BNO fully disabled (isolation mode for DXL communication test)
+#ifndef OP3_BNO_ENABLE
+#define OP3_BNO_ENABLE 0
+#endif
+
 #ifndef BDPIN_BAT_PWR_ADC
 #define BDPIN_BAT_PWR_ADC A5  // Analog pin for battery voltage monitoring
 #endif

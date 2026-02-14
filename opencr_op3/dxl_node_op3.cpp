@@ -135,11 +135,6 @@ void dxl_node_op3_loop(void)
   p_dxl_mem->Yaw    = dxl_hw_op3_get_rpy(2);
 
 
-  // ===== BNO055 CALIBRATION HANDLING =====
-  uint8_t sys_cal, gyro_cal, accel_cal, mag_cal;
-  dxl_hw_op3_bno_get_calibration(&sys_cal, &gyro_cal, &accel_cal, &mag_cal);
-
-  // Calibration Request for Roll/Pitch/Yaw offset
   for(i=0; i<3; i++)
   {
     if(p_dxl_mem->IMU_Control & (1<<i))
@@ -157,33 +152,31 @@ void dxl_node_op3_loop(void)
         p_dxl_mem->Pitch_Offset = dxl_hw_op3_get_offset(1) * 10.;
         p_dxl_mem->Yaw_Offset   = dxl_hw_op3_get_offset(2) * 10.;
 
-        for(uint8_t offset_addr = 18; offset_addr <= 23; offset_addr++)
-        {
-          EEPROM.update(offset_addr, mem.data[offset_addr]);
-        }
+
+        EEPROM[18] = mem.data[18];
+        EEPROM[19] = mem.data[19];
+        EEPROM[20] = mem.data[20];
+        EEPROM[21] = mem.data[21];
       }
     }
   }
 
-  // BNO055 Calibration Check & Save
   if(p_dxl_mem->IMU_Control & (1<<3))
   {
-    // Bit 3: Magnetometer/System calibration + save to EEPROM
     if(gyro_cali_state == 0)
     {
-      if(sys_cal == 3 && mag_cal == 3)
+      dxl_hw_op3_start_gyro_cali();
+      gyro_cali_state = 1;
+    }
+    else
+    {
+      if(dxl_hw_op3_get_gyro_cali_done() == true)
       {
-        // Fully calibrated - save to EEPROM
-        dxl_hw_op3_bno_save_calibration();
         p_dxl_mem->IMU_Control &= ~(1<<3);
         gyro_cali_state = 0;
       }
-      else
-      {
-        // Still calibrating
-        gyro_cali_state = 1;
-      }
     }
+
   }
 
 
@@ -323,6 +316,14 @@ void dxl_node_op3_btn_loop(void)
       break;
 
     case 2:
+      if( (millis()-btn_time) > 300 )
+      {
+        dxl_node_write_byte(24, 1);
+        btn_state = 3;
+      }
+      break;
+
+    case 3:
       if( !dxl_hw_op3_button_read(PIN_BUTTON_S4) ) btn_state = 0;
       break;
 
@@ -397,7 +398,7 @@ void dxl_node_op3_reset(void)
 
   dxl_hw_op3_set_offset(0, (float)p_dxl_mem->Roll_Offset/10.);
   dxl_hw_op3_set_offset(1, (float)p_dxl_mem->Pitch_Offset/10.);
-  dxl_hw_op3_set_offset(2, (float)p_dxl_mem->Yaw_Offset/10.);
+  //dxl_hw_op3_set_offset(2, (float)p_dxl_mem->Yaw_Offset/10.);
 }
 
 
@@ -513,12 +514,12 @@ void dxl_node_write_byte(uint16_t addr, uint8_t data)
 
   if( RANGE_CHECK(addr, p_dxl_mem->Buzzer) )
   {
-    #if OP3_BUZZER_ENABLE
-      if( p_dxl_mem->Buzzer > 0 ) tone(BDPIN_BUZZER, p_dxl_mem->Buzzer);
-      else                        noTone(BDPIN_BUZZER);
-    #else
-      noTone(BDPIN_BUZZER);
-    #endif
+#if OP3_BUZZER_ENABLE
+    if( p_dxl_mem->Buzzer > 0 ) tone(BDPIN_BUZZER, p_dxl_mem->Buzzer);
+    else                        noTone(BDPIN_BUZZER);
+#else
+    noTone(BDPIN_BUZZER);
+#endif
   }
 }
 

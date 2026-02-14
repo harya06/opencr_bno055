@@ -30,9 +30,6 @@ Blink Timing Definition:
 */
 
 
-// Include compatibility header for Adafruit libraries
-#include "pins_arduino_compat.h"
-
 #include "dxl_node_op3.h"
 
 

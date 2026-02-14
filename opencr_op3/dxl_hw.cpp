@@ -11,6 +11,7 @@
 
 /* For debug */
 uint32_t tx_led_count, rx_led_count;
+volatile uint32_t g_dxl_last_io_ms = 0;
 
 /*---------------------------------------------------------------------------
      TITLE   : dxl_hw_begin
@@ -89,6 +90,7 @@ void dxl_hw_write(uint8_t value)
 uint8_t dxl_hw_read(void)
 {
   rx_led_count = 3;
+  g_dxl_last_io_ms = millis();
   //uint8_t data = DXL_PORT.read();
   return DXL_PORT.read();
 }
@@ -110,6 +112,7 @@ void dxl_hw_write(uint8_t *p_data, uint32_t length)
     DXL_PORT.write(p_data[i]);
   }
   DXL_PORT.flush();
+  g_dxl_last_io_ms = millis();
   
   tx_led_count = 3;
 

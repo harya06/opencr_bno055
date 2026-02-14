@@ -2,33 +2,27 @@
  *  dxl_hw.h
  *
  *  dynamixel hardware
- *
- *  Created on: 2016. 10. 21.
- *      Author: Baram
  */
 
 #ifndef DXL_HW_H
 #define DXL_HW_H
 
-
 #include "dxl_def.h"
-
+#include "dxl_hw_op3.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-
 #ifdef __cplusplus
 }
 #endif
 
-
 #define DXL_LED_RX            BDPIN_LED_USER_1
 #define DXL_LED_TX            BDPIN_LED_USER_2
 
-
 uint32_t dxl_hw_begin(uint8_t baud);
+extern volatile uint32_t g_dxl_last_io_ms;
 
 void dxl_hw_tx_enable(void);
 void dxl_hw_tx_disable(void);

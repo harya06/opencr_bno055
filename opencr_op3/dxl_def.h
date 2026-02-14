@@ -11,7 +11,6 @@
 #define DXL_DEF_H
 
 #include <Arduino.h>
-#include "board_config.h"
 #include <math.h>
 #include <string.h>
 #include <stdarg.h>
