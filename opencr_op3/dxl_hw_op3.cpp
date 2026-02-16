@@ -241,9 +241,10 @@ void dxl_hw_op3_bno_update(void)
   // Always prioritize fused orientation update.
   {
     imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    imu_euler[0] = euler.y();
-    imu_euler[1] = euler.z();
-    imu_euler[2] = euler.x();
+
+    imu_euler[0] = euler.z();  // roll
+    imu_euler[1] = euler.y();  // pitch
+    imu_euler[2] = euler.x();  // yaw
   }
 
 #if !OP3_BNO_EULER_ONLY_MODE

@@ -39,7 +39,7 @@
 #endif
 
 #ifndef OP3_BNO_UPDATE_PERIOD_MS
-#define OP3_BNO_UPDATE_PERIOD_MS 100
+#define OP3_BNO_UPDATE_PERIOD_MS 20
 #endif
 
 #ifndef OP3_BNO_CALIB_POLL_PERIOD_MS
@@ -47,7 +47,7 @@
 #endif
 
 #ifndef OP3_BNO_SKIP_WHEN_DXL_BUSY
-#define OP3_BNO_SKIP_WHEN_DXL_BUSY 1
+#define OP3_BNO_SKIP_WHEN_DXL_BUSY 0
 #endif
 
 #ifndef OP3_BNO_DXL_IDLE_GUARD_MS

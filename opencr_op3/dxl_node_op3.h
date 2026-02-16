@@ -69,10 +69,6 @@ typedef struct
 } __attribute__((packed)) dxl_mem_op3_t;
 
 
-
-
-
-
 void dxl_node_op3_init(void);
 void dxl_node_op3_loop(void);
 

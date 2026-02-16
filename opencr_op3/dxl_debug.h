@@ -26,11 +26,6 @@
 }
 #endif
 
-
-
-
-
-
 void dxl_debug_init(void);
 void dxl_debug_loop(void);
 
